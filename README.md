@@ -18,7 +18,7 @@ Simple enough! A `Maybe` type is a "box" which can contains the value or ... not
 
 ![functor](http://adit.io/imgs/functors/context.png)
 
-The interesting part come from here: we can define a `fmap` function which take a normal function and a `Maybe` type, then return another `Maybe`
+The interesting part come from here: we can define a `fmap` function which takes a normal function and a `Maybe` type, then return another `Maybe`
 
 ![fmap](http://adit.io/imgs/functors/fmap_apply.png)
 
