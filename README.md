@@ -1,7 +1,7 @@
 # Preface
 
 This post has many awesome pictures which credits go to [Aditya Bhargava](https://twitter.com/_egonschiele). His original article
-[Functors, Applicatives, And Monads In Pictures](http://adit.io/posts/2013-04-17-functors,_applicatives,_and_monads_in_pictures.html) is extremyly well written, with sample code in Haskell though.
+[Functors, Applicatives, And Monads In Pictures](http://adit.io/posts/2013-04-17-functors,_applicatives,_and_monads_in_pictures.html) is extremely well written, with sample code in Haskell though.
 
 In this post I will try to provide proof of concept of Functor/Applicatives/Monad in pure Swift, plus example for using Reader Monad for Dependency Injection(DI), and the idea of Try monad concept from Scala.
 
@@ -56,7 +56,7 @@ extension Maybe {
 	}
 }
 ```
-That is it! Our `Maybe` now is bot **Functor** and **Applicatives**.
+That is it! Our `Maybe` now is both **Functor** and **Applicatives**.
 
 # Maybe is Monad
 > How to learn about Monads:
@@ -100,7 +100,7 @@ And this is how it is actually processed
 
 ![half monad](http://adit.io/imgs/functors/monad_chain.png)
 
-Now our `Maybe` is **Functor**,**Applicatives** and also **Monad** as well.
+Now our `Maybe` is **Functor**, **Applicatives** and also **Monad** as well.
 
 # A step further, the Reader monad
 In this section I will introduce minimal version for one of three useful Monads: the Reader Monad
@@ -141,6 +141,8 @@ f.apply(20) // 2.5
 
 ## Why Reader monad matter
 Reader monad take `g` function in `init` time. By switching (or *injecting*) this function, we can create our own Dependency Injection(DI) framework easily. Let's see an example:
+
+This is our model:
 ```swift
 struct User {
 	var name: String
@@ -157,6 +159,9 @@ struct DB {
 		print(u.name + " in: " + path)
 	}
 }
+```
+and usage:
+```swift
 let dbPath = "path_to_db"
 func update(userName: String, newName: String) -> Void {
 	let db = DB(path: dbPath)
@@ -202,14 +207,15 @@ enum Try<T> {
 	case Successful(T)
 	case Failure(ErrorType)
 	init(f: () throws -> T) {
-	do {
-		self = .Successful(try f())
-	} catch {
-		self = .Failure(error)
+		do {
+			self = .Successful(try f())
+		} catch {
+			self = .Failure(error)
+		}
 	}
 }
 ```
-To make `Try` a monad, I will add `map` and `flatMap` function
+To make `Try` a functor/monad, I will add `map` and `flatMap` function
 ```swift
 extension Try {
 	func map<U>(f: T -> U) -> Try<U> {
@@ -226,7 +232,7 @@ extension Try {
 	}
 }
 ```
-With an operation which can throws some ErrorType, just wrap them out in a Try and chain(with `map` and `flatMap`) to whenever you want. At every step the result will be a `Try` type. When you want the real value inside that box, just do a pattern matching.
+With an operation which can throws some ErrorType, just wrap them inside a Try and chain(with `map` and `flatMap`) to whenever you want. At every step the result will be a `Try` type. When you want the real value inside that box, just do a pattern matching.
 ```swift
 enum DoomsdayComing: ErrorType {
 	case Boom
