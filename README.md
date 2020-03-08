@@ -10,8 +10,8 @@ In this post I will try to provide proof of concept of Functor/Applicatives/Mona
 We all know the Optional Type (the ? mark) in Swift. We can define our option type named `Maybe` using enum.
 ```swift
 enum Maybe<T> {
-	case just(T)
-	case nothing
+    case just(T)
+    case nothing
 }
 ```
 Simple enough! A `Maybe` type is a "box" which can contains the value or ... nothing
@@ -28,8 +28,8 @@ extension Maybe {
 	
     func fmap<U>(f: T -> U) -> Maybe<U> {
 	switch self {
-		case .just(let x): return .just(f(x))
-		case .nothing: return .nothing
+	    case .just(let x): return .just(f(x))
+	    case .nothing: return .nothing
 	}
     }
 
@@ -53,8 +53,8 @@ extension Maybe {
 	
     func apply<U>(f: Maybe<T -> U>) -> Maybe<U> {
 	switch f {
-		case .just(let justF): return self.fmap(justF)
-		case .nothing: return .nothing
+	    case .just(let justF): return self.fmap(justF)
+	    case .nothing: return .nothing
 	}
     }
 
@@ -79,8 +79,8 @@ extension Maybe {
 	
     func flatMap<U>(f: T -> Maybe<U>) -> Maybe<U> {
 	switch self {
-		case .just(let x): return (f(x))
-		case .nothing: return .nothing
+	    case .just(let x): return (f(x))
+	    case .nothing: return .nothing
 	}
     }
     
@@ -124,11 +124,11 @@ class Reader<E, A> {
     }
 	
     func map<B>(f: A -> B) -> Reader<E, B> {
-	return Reader<E, B>{ e in f(self.g(e)) }
+	return Reader<E, B> { e in f(self.g(e)) }
     }
 	
     func flatMap<B>(f: A -> Reader<E, B>) -> Reader<E, B> {
-	return Reader<E, B>{ e in f(self.g(e)).g(e) }
+	return Reader<E, B> { e in f(self.g(e)).g(e) }
     }
 
 }
@@ -144,10 +144,10 @@ func >>=<E, A, B>(a: Reader<E, A>, f: A -> Reader<E, B>) -> Reader<E, B> {
 }
 
 func half(i: Float ) -> Reader<Float , Float> {
-    return Reader{_ in i/2}
+    return Reader { _ in i/2 }
 }
 
-let f = Reader{i in i} >>= half >>= half >>= half
+let f = Reader { i in i } >>= half >>= half >>= half
 f.apply(20) // 2.5
 ```
 
@@ -200,7 +200,7 @@ struct Environment {
 }
 
 func updateF(userName: String, newName: String) -> Reader<Environment, Void> {
-    return Reader<Environment, Void>{ env in
+    return Reader<Environment, Void> { env in
 	let db = DB(path: env.path)
 	var user = db.findUser(userName)
 	user.name = newName
@@ -228,11 +228,12 @@ Scala's `Try` type is a functional approach for error handling. Very likely to O
 enum Try<T> {
     case successful(T)
     case failure(ErrorType)
+
     init(f: () throws -> T) {
 	do {
-		self = .Successful(try f())
+	    self = .successful(try f())
 	} catch {
-		self = .Failure(error)
+	    self = .failure(error)
 	}
     }
 }
@@ -243,15 +244,15 @@ extension Try {
 	
     func map<U>(f: T -> U) -> Try<U> {
 	switch self {
-		case .Successful(let value): return .Successful(f(value))
-		case .Failure(let error): return .Failure(error)
+	    case .successful(let value): return .successful(f(value))
+	    case .failure(let error): return .failure(error)
 	}
     }
 	
     func flatMap<U>(f: T -> Try<U>) -> Try<U> {
 	switch self {
-		case .Successful(let value): return f(value)
-		case .Failure(let error): return .Failure(error)
+	    case .successful(let value): return f(value)
+	    case .failure(let error): return .failure(error)
 	}
     }
 
@@ -268,10 +269,10 @@ let endOfTheWorld = Try {
     throw DoomsdayComing.Bang
 }
 
-let result = Try {4/2}.flatMap { _ in endOfTheWorld}
+let result = Try {4/2}.flatMap { _ in endOfTheWorld }
 switch result {
-    case .Successful(let value): print(value)
-    case .Failure(let error): print(error)
+    case .successful(let value): print(value)
+    case .failure(let error): print(error)
 }
 // Bang
 ```
